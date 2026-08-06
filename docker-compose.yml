@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: jpalab
+      POSTGRES_USER: jpalab
+      POSTGRES_PASSWORD: jpalab
+    ports:
+      - "5432:5432"
