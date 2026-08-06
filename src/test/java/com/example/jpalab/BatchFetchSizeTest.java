@@ -12,34 +12,23 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * hibernate.default_batch_fetch_size는 엔티티 코드 변경 없이 프로퍼티만으로 N+1을
  * 줄여주는 전략이라, 다른 테스트와 스프링 컨텍스트(프로퍼티)가 달라서 별도 클래스로 분리.
  * author 10명 / batch size 5 -> IN 절로 2번에 나눠 배치 조회될 것으로 기대.
+ *
+ * 로컬에서 `docker compose up -d`로 미리 띄운 postgres(application.yml의
+ * spring.datasource 설정)에 붙는다는 전제. 트랜잭션으로 감싸서 끝나면 롤백.
  */
-@Testcontainers
 @SpringBootTest(properties = "spring.jpa.properties.hibernate.default_batch_fetch_size=5")
+@Transactional
 class BatchFetchSizeTest {
 
     private static final int AUTHOR_COUNT = 10;
     private static final int BOOKS_PER_AUTHOR = 5;
     private static final int BATCH_SIZE = 5;
-
-    @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16");
-
-    @DynamicPropertySource
-    static void datasourceProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-    }
 
     @Autowired
     private AuthorRepository authorRepository;

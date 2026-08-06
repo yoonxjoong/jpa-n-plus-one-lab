@@ -1,4 +1,8 @@
 spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/jpalab
+    username: jpalab
+    password: jpalab
   jpa:
     hibernate:
       ddl-auto: create-drop

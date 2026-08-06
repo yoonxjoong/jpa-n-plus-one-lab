@@ -13,33 +13,23 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * default_batch_fetch_size를 건드리지 않는 순정 설정에서 findAll() 기본 lazy loading,
  * fetch join, EntityGraph, DTO projection 4가지를 같은 데이터로 비교.
  * batch size 비교는 별도 프로퍼티가 필요해서 {@link BatchFetchSizeTest}에서 따로 함.
+ *
+ * 로컬에서 `docker compose up -d`로 미리 띄운 postgres(application.yml의
+ * spring.datasource 설정)에 붙는다는 전제. 각 테스트는 트랜잭션으로 감싸서
+ * 끝나면 자동 롤백되므로, 여러 번 실행해도 데이터가 안 쌓임.
  */
-@Testcontainers
 @SpringBootTest
+@Transactional
 class NPlusOneStrategiesTest {
 
     private static final int AUTHOR_COUNT = 10;
     private static final int BOOKS_PER_AUTHOR = 5;
-
-    @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16");
-
-    @DynamicPropertySource
-    static void datasourceProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-    }
 
     @Autowired
     private AuthorRepository authorRepository;
