@@ -25,6 +25,9 @@ public class Author {
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List<Book> books = new ArrayList<>();
 
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    private List<Award> awards = new ArrayList<>();
+
     public Author(String name) {
         this.name = name;
     }
@@ -32,5 +35,10 @@ public class Author {
     public void addBook(Book book) {
         books.add(book);
         book.assignAuthor(this);
+    }
+
+    public void addAward(Award award) {
+        awards.add(award);
+        award.assignAuthor(this);
     }
 }

@@ -27,4 +27,13 @@ public class QueryCounter {
     public long statementCount() {
         return statistics.getPrepareStatementCount();
     }
+
+    /**
+     * 실제로 메모리에 로딩된 엔티티 총 개수. 쿼리 수는 적어도(1~2번) 컬렉션
+     * fetch join + 페이징을 잘못 조합하면 이 값이 요청한 페이지 크기보다
+     * 훨씬 커질 수 있음 -> "쿼리 수만으로는 안 보이는 문제"를 잡는 지표.
+     */
+    public long entityLoadCount() {
+        return statistics.getEntityLoadCount();
+    }
 }
